@@ -22,10 +22,10 @@ group2 = df[df["test group"] == "psa"]
 df["total ads flag"] = (df["total ads"] > 0) * 1
 df["most ads hour flag"] = (df["most ads hour"] > 0) * 1
 print(
-    ":\n",
+    "Высчитываем медиану по двум группам:\n",
     df.groupby(["test group"])[["total ads flag", "total ads"]].agg(
         {"total ads flag": ["count", "mean"], "total ads": ["mean", "median"]}
     ),
 )
-print(":\n", ttest_ind(a=group1["total ads"], b=group2["total ads"]))
-print(":\n", ttest_ind(a=group1["most ads hour"], b=group2["most ads hour"]))
+print("T-тест для двух независимых групп по количеству подписок:\n", ttest_ind(a=group1["total ads"], b=group2["total ads"]))
+print("T-тест для двух независимых групп по времени:\n", ttest_ind(a=group1["most ads hour"], b=group2["most ads hour"]))
