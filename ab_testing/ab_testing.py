@@ -27,5 +27,11 @@ print(
         {"total ads flag": ["count", "mean"], "total ads": ["mean", "median"]}
     ),
 )
-print("T-тест для двух независимых групп по количеству подписок:\n", ttest_ind(a=group1["total ads"], b=group2["total ads"]))
-print("T-тест для двух независимых групп по времени:\n", ttest_ind(a=group1["most ads hour"], b=group2["most ads hour"]))
+print(
+    "T-тест для двух независимых групп по количеству подписок:\n",
+    ttest_ind(a=group1["total ads"], b=group2["total ads"]),
+)
+print(
+    "T-тест для двух независимых групп по времени:\n",
+    ttest_ind(a=group1["most ads hour"], b=group2["most ads hour"]),
+)
