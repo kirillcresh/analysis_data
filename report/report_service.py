@@ -50,6 +50,7 @@ class CallReportService:
             self.session.commit()
         tariffs_call = df["Тариф"].tolist()
         flag = True
+
         # Добавляем уникальные тарифы в БД
         # Уникальность можно проставить на уровне БД
         tariffs_set = set(tariffs_call)
@@ -76,6 +77,7 @@ class CallReportService:
         self.session.commit()
         caller_call = df["Вызывающий"].tolist()
         called_call = df["Вызываемый"].tolist()
+
         # Добавляем клиентов
         tariffs_bd = self.session.query(Tariff).all()
         set_clients = set(caller_call+called_call)
