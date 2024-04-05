@@ -1,19 +1,19 @@
 import datetime
 
-from fastapi import Depends
 import pandas as pd
+from fastapi import Depends
+
 from database import Session, get_session
-from report.models import Status, Document, Tariff, Client, Call
+from report.models import Call, Client, Document, Status, Tariff
 
 
 class CallReportService:
-
     def __init__(self, session: Session = Depends(get_session)):
         self.session = session
 
     def data_to_db(self):
         flag = True
-        file_location = 'E:/work_IT/study/analysis_data/report/report_call.xlsx'
+        file_location = "E:/work_IT/study/analysis_data/report/report_call.xlsx"
         df = pd.read_excel(file_location)
         statuses_call = df["Статус"].tolist()
 
@@ -27,15 +27,18 @@ class CallReportService:
                     flag = False
                     break
             if flag:
-                statuses_bd = Status(type=status,
-                                     description="Описание статуса")
+                statuses_bd = Status(type=status, description="Описание статуса")
                 self.session.add(statuses_bd)
             flag = True
         self.session.commit()
 
         # Добавляем документ
         # Так как работа идет над определенным файлом, то добавляю таким способом
-        document_bd = self.session.query(Document).filter(Document.date == datetime.date.today()).first()
+        document_bd = (
+            self.session.query(Document)
+            .filter(Document.date == datetime.date.today())
+            .first()
+        )
         name_report = "report_call.xlsx"
         try:
             doc_name = document_bd.name
@@ -44,8 +47,7 @@ class CallReportService:
         except:
             flag = True
         if flag:
-            document = Document(name=name_report,
-                                date=datetime.date.today())
+            document = Document(name=name_report, date=datetime.date.today())
             self.session.add(document)
             self.session.commit()
         tariffs_call = df["Тариф"].tolist()
@@ -69,9 +71,9 @@ class CallReportService:
                     price = 0.6
                 else:
                     price = 4
-                tariff_bd = Tariff(name=tariff,
-                                   description="Наш лучший тариф",
-                                   price_per_minute=price)
+                tariff_bd = Tariff(
+                    name=tariff, description="Наш лучший тариф", price_per_minute=price
+                )
                 self.session.add(tariff_bd)
             flag = True
         self.session.commit()
@@ -80,7 +82,7 @@ class CallReportService:
 
         # Добавляем клиентов
         tariffs_bd = self.session.query(Tariff).all()
-        set_clients = set(caller_call+called_call)
+        set_clients = set(caller_call + called_call)
         client_tariff_df = df[["Вызывающий", "Тариф"]]
         client_tariff_df = client_tariff_df.reset_index()
         client_tariff_list = []
@@ -104,11 +106,13 @@ class CallReportService:
                     if tariff == tariff_bd.name:
                         tariff_id = tariff_bd.id
                         break
-                client_bd = Client(full_name="Наш Любимый Клиент",
-                                   tariff_id=tariff_id,
-                                   phone=phone[1:],
-                                   is_active=True,
-                                   balance=500)
+                client_bd = Client(
+                    full_name="Наш Любимый Клиент",
+                    tariff_id=tariff_id,
+                    phone=phone[1:],
+                    is_active=True,
+                    balance=500,
+                )
                 self.session.add(client_bd)
             self.session.commit()
             flag = True
@@ -118,9 +122,14 @@ class CallReportService:
         call_df = df.reset_index()
         call_list = []
         for index, row in call_df.iterrows():
-            call = {"Вызывающий": row["Вызывающий"], "Вызываемый": row["Вызываемый"],
-                    "Длительность": row["Длительность"], "Тариф": row["Тариф"],
-                    "Статус": row["Статус"], "Дата звонка": row["Дата звонка"]}
+            call = {
+                "Вызывающий": row["Вызывающий"],
+                "Вызываемый": row["Вызываемый"],
+                "Длительность": row["Длительность"],
+                "Тариф": row["Тариф"],
+                "Статус": row["Статус"],
+                "Дата звонка": row["Дата звонка"],
+            }
             call_list.append(call)
         for call in call_list:
             # Убрать питоновские ошибки
@@ -140,17 +149,22 @@ class CallReportService:
                     status_id = status.id
             documents = self.session.query(Document).all()
             for document in documents:
-                if document.name == "report_call.xlsx" and document.date == datetime.date.today():
+                if (
+                    document.name == "report_call.xlsx"
+                    and document.date == datetime.date.today()
+                ):
                     document_id = document.id
             call_date = call["Дата звонка"]
             # Эксель переделывает 1:14 в 1:14:00
             duration = str(call["Длительность"])
-            call_bd = Call(caller_id=caller_id,
-                           called_id=called_id,
-                           duration=duration,
-                           status_id=status_id,
-                           document_id=document_id,
-                           call_date=call_date)
+            call_bd = Call(
+                caller_id=caller_id,
+                called_id=called_id,
+                duration=duration,
+                status_id=status_id,
+                document_id=document_id,
+                call_date=call_date,
+            )
             self.session.add(call_bd)
         self.session.commit()
         return {"detail": "Success"}

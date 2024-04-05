@@ -1,4 +1,4 @@
-from sqlalchemy import MetaData, Table, create_engine
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from settings import settings

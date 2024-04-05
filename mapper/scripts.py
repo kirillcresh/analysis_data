@@ -1,11 +1,15 @@
 from math import floor
 
-file_list: list[str] = ["ФСД дз4 - Лист1.csv", "ФСД дз4 - Лист2.csv", "ФСД дз4 - Лист3.csv"]
+file_list: list[str] = [
+    "ФСД дз4 - Лист1.csv",
+    "ФСД дз4 - Лист2.csv",
+    "ФСД дз4 - Лист3.csv",
+]
 map_results: list[dict[str, int]] = []
 
 
 def map_f(file: str):
-    with open(file, "r", encoding="UTF-8") as f:
+    with open(file, encoding="UTF-8") as f:
         caller = []
         duration = []
         lines = f.readlines()
@@ -17,7 +21,7 @@ def map_f(file: str):
                 pos_duration = i
         for line in lines[1:]:
             line = line.split(",")
-            if not line[pos_caller] in caller:
+            if line[pos_caller] not in caller:
                 caller.append(line[pos_caller])
                 duration.append(line[pos_duration])
             else:
@@ -67,8 +71,8 @@ def reducer(key, grouped_values):
                 split_dur = duration.split(":")
                 minutes = split_dur[0]
                 second = split_dur[1]
-                min_to_sec = int(minutes)*60
-                duration_sec = int(second)+min_to_sec
+                min_to_sec = int(minutes) * 60
+                duration_sec = int(second) + min_to_sec
                 sum_duration_sec += duration_sec
         else:
             if durations == "":
@@ -82,9 +86,9 @@ def reducer(key, grouped_values):
             sum_duration_sec += duration_sec
         total_count_dur += count_dur
         group_sum_duration_sec += sum_duration_sec
-    avg_dur = group_sum_duration_sec/total_count_dur
-    avg_min = floor(avg_dur/60)
-    avg_sec = int(avg_dur-avg_min*60)
+    avg_dur = group_sum_duration_sec / total_count_dur
+    avg_min = floor(avg_dur / 60)
+    avg_sec = int(avg_dur - avg_min * 60)
     if avg_sec < 10:
         avg_sec = f"0{avg_sec}"
     grouped_values = f"{avg_min}:{avg_sec}"

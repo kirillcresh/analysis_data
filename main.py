@@ -7,7 +7,6 @@ from fastapi.templating import Jinja2Templates
 from report.routers import router
 from settings import settings
 
-
 tags_metadata = [
     {
         "name": "ReportService",
